@@ -63,18 +63,26 @@ export default async function handler(req, res) {
       });
     }
 
-    const data = await response.json();
+   const data = await response.json();
 
-    // Make sure we actually got a response
-    if (!data.choices || data.choices.length === 0) {
-      return res.status(500).json({ error: 'No response received from AI.' });
-    }
+// Make sure we actually got a response
+if (!data.choices || data.choices.length === 0) {
+  return res.status(500).json({ error: 'No response received from AI.' });
+}
 
-    // Send back just the message content to the frontend
-    return res.status(200).json({
-      message: data.choices[0].message.content,
-      model: data.model
-    });
+const content = data.choices[0]?.message?.content 
+  || data.choices[0]?.text 
+  || null;
+
+if (!content) {
+  return res.status(500).json({ error: 'AI returned an empty response. Try again or switch models.' });
+}
+
+// Send back just the message content to the frontend
+return res.status(200).json({
+  message: content,
+  model: data.model
+});
 
   } catch (error) {
     console.error('Server error:', error);
