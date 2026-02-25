@@ -1,3 +1,18 @@
+/**
+ * RicoAI - Vercel Serverless Function
+ * -----------------------------------------
+ * This function acts as a secure proxy between
+ * the frontend and OpenRouter API.
+ * 
+ * - Hides the API key from the browser
+ * - Handles error responses gracefully
+ * - Supports multiple AI models via OpenRouter
+ * 
+ * Author: Olayinka Olumide
+ * Branch: api-integration
+ */
+
+
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
