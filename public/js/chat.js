@@ -1,39 +1,34 @@
-
-
-// ============================================
-// RICOAI - chat.js
 // Chat history, localStorage, model switching
-// ============================================
 
 console.log('RicoAI chat.js loaded');
 
-// ===== CHAT STATE =====
+// Chat history management
 let chatHistory = [];
 let allChats = [];
 let currentChatId = null;
 
-// ===== ADD MESSAGE TO HISTORY =====
+// add message to history
 function addToHistory(role, content) {
   chatHistory.push({ role, content });
 }
 
-// ===== GET FULL CHAT HISTORY =====
+// get current chat history
 function getChatHistory() {
   return chatHistory;
 }
 
-// ===== CLEAR CURRENT CHAT HISTORY =====
+// clear current chat history (but not all chats)
 function clearChatHistory() {
   chatHistory = [];
   currentChatId = null;
 }
 
-// ===== GENERATE UNIQUE CHAT ID =====
+// generates unique chat ID based on timestamp
 function generateChatId() {
   return 'chat_' + Date.now();
 }
 
-// ===== SAVE CURRENT CHAT TO LOCALSTORAGE =====
+// save current chat to localStorage (called after every new message)
 function saveCurrentChat() {
   if (chatHistory.length === 0) return;
 
@@ -73,7 +68,7 @@ function saveCurrentChat() {
   renderChatHistory();
 }
 
-// ===== LOAD ALL CHATS FROM LOCALSTORAGE =====
+// load all chats from localStorage on startup
 function loadAllChats() {
   const saved = localStorage.getItem('rico-chats');
   if (saved) {
@@ -86,7 +81,7 @@ function loadAllChats() {
   }
 }
 
-// ===== RENDER CHAT HISTORY IN SIDEBAR =====
+// render chat history in sidebar
 function renderChatHistory() {
   const historyList = document.getElementById('chatHistoryList');
   if (!historyList) return;
@@ -129,7 +124,7 @@ function renderChatHistory() {
   });
 }
 
-// ===== DELETE CONFIRMATION =====
+// delete confirmation 
 function showDeleteConfirm(chatId, chatTitle, itemElement) {
   // Replace the item temporarily with a confirm UI
   const originalContent = itemElement.innerHTML;
@@ -222,7 +217,7 @@ function showDeleteConfirm(chatId, chatTitle, itemElement) {
   itemElement.appendChild(btnRow);
 }
 
-// ===== LOAD A PREVIOUS CHAT =====
+// loads previously saved chat into the chat window
 function loadChat(chatId) {
   const chat = allChats.find(c => c.id === chatId);
   if (!chat) return;
@@ -258,7 +253,7 @@ function loadChat(chatId) {
   if (overlay) overlay.classList.remove('open');
 }
 
-// ===== DELETE A CHAT =====
+// delete a chat from allChats and localStorage
 function deleteChat(chatId) {
   allChats = allChats.filter(c => c.id !== chatId);
   localStorage.setItem('rico-chats', JSON.stringify(allChats));
@@ -270,5 +265,5 @@ function deleteChat(chatId) {
   renderChatHistory();
 }
 
-// ===== INIT - Load chats on startup =====
+// INIT - Load chats on startup 
 loadAllChats();

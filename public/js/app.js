@@ -1,18 +1,16 @@
 // app.js - Main application logic
+
 console.log('RicoAI app.js loaded');
 
 
-// ============================================
-// RICOAI - app.js
-// Main application logic
-// ============================================
 
-// ===== STATE =====
+
+// state variables
 let isLoading = false;
 let currentSystemPrompt = `You are RicoAI, a helpful, smart, and concise AI assistant. 
 You can help with anything from coding to creative writing to research.`;
 
-// ===== DOM ELEMENTS =====
+// dom elements
 const sendBtn = document.getElementById('sendBtn');
 const userInput = document.getElementById('userInput');
 const chatWindow = document.getElementById('chatWindow');
@@ -28,7 +26,7 @@ const systemPromptInput = document.getElementById('systemPrompt');
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
 
-// ===== THEME TOGGLE =====
+// theme toggle
 themeToggle.addEventListener('change', () => {
   const theme = themeToggle.checked ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', theme);
@@ -42,7 +40,7 @@ document.documentElement.setAttribute('data-theme', savedTheme);
 document.documentElement.style.background = savedTheme === 'dark' ? '#212121' : '#e8e8f0';
 themeToggle.checked = savedTheme === 'dark';
 
-// ===== MOBILE SIDEBAR TOGGLE =====
+// mobile sidebar toggle
 menuToggle.addEventListener('click', () => {
   sidebar.classList.toggle('open');
   // Create overlay if it doesn't exist
@@ -59,7 +57,7 @@ menuToggle.addEventListener('click', () => {
   overlay.classList.toggle('open');
 });
 
-// ===== SETTINGS MODAL =====
+// settings modal
 settingsBtn.addEventListener('click', () => {
   systemPromptInput.value = currentSystemPrompt;
   modalOverlay.classList.add('open');
@@ -79,7 +77,7 @@ saveSettings.addEventListener('click', () => {
   showToast('Settings saved!');
 });
 
-// ===== TOAST NOTIFICATION =====
+// toast notification
 function showToast(message) {
   const toast = document.createElement('div');
   toast.className = 'toast';
@@ -92,19 +90,19 @@ function showToast(message) {
   }, 2500);
 }
 
-// ===== GET TIMESTAMP =====
+// get current time for message timestamps
 function getTimestamp() {
   return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-// ===== HIDE WELCOME SCREEN =====
+// hide welcome screen message
 function hideWelcome() {
   if (welcomeScreen) {
     welcomeScreen.style.display = 'none';
   }
 }
 
-// ===== RENDER A MESSAGE BUBBLE =====
+// render a message bubble 
 function renderMessage(role, content) {
   hideWelcome();
 
@@ -145,7 +143,7 @@ function renderMessage(role, content) {
   return messageDiv;
 }
 
-// ===== RENDER ERROR BUBBLE =====
+// error message bubble
 function renderError(message) {
   const messageDiv = document.createElement('div');
   messageDiv.className = 'message ai';
@@ -164,7 +162,7 @@ function renderError(message) {
   scrollToBottom();
 }
 
-// ===== TYPING INDICATOR =====
+// shows typing indicator
 function showTypingIndicator() {
   const wrapper = document.createElement('div');
   wrapper.className = 'message ai';
@@ -184,12 +182,12 @@ function removeTypingIndicator() {
   if (indicator) indicator.remove();
 }
 
-// ===== SCROLL TO BOTTOM =====
+// scroll chat to bottom
 function scrollToBottom() {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// ===== SEND MESSAGE =====
+// send message to serverless function and handle response
 async function sendMessage() {
   const content = userInput.value.trim();
   if (!content || isLoading) return;
@@ -259,10 +257,10 @@ async function sendMessage() {
   }
 }
 
-// ===== SEND ON BUTTON CLICK =====
+// event listener for send button
 sendBtn.addEventListener('click', sendMessage);
 
-// ===== SEND ON ENTER (Shift+Enter for new line) =====
+// send on enter(Shift+Enter for new line)
 userInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -270,19 +268,19 @@ userInput.addEventListener('keydown', (e) => {
   }
 });
 
-// ===== AUTO RESIZE TEXTAREA =====
+// auto-resize textarea
 userInput.addEventListener('input', () => {
   userInput.style.height = 'auto';
   userInput.style.height = Math.min(userInput.scrollHeight, 200) + 'px';
 });
 
-// ===== SUGGESTION CHIPS =====
+// suggestion chip click handler
 function useChip(btn) {
   userInput.value = btn.textContent;
   sendMessage();
 }
 
-// ===== NEW CHAT =====
+// new chat button - clear history and show welcome screen
 newChatBtn.addEventListener('click', () => {
   clearChatHistory();
   chatWindow.innerHTML = '';
@@ -304,5 +302,5 @@ newChatBtn.addEventListener('click', () => {
   chatWindow.appendChild(welcome);
 });
 
-// ===== INIT =====
+// INIT
 console.log('RicoAI app.js fully loaded');

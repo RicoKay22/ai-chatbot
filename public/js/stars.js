@@ -1,9 +1,8 @@
-// ============================================
 // RICO STAR BACKGROUND
 // VERSION 1 = Twinkling Stars
 // VERSION 4 = Stars + Shooting Stars
 // Change the number below to switch versions
-// ============================================
+
 
 console.log('stars.js loaded, canvas:', document.getElementById('starCanvas'));
 const STAR_VERSION = 4;
@@ -15,18 +14,18 @@ let stars = [];
 let shootingStars = [];
 let animationId;
 
-// ===== CANVAS SIZING =====
+// canvas resize function to fill the screen
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
 
-// ===== CHECK CURRENT THEME =====
+// check if current theme is dark mode
 function isDarkMode() {
   return document.documentElement.getAttribute('data-theme') === 'dark';
 }
 
-// ===== CREATE STARS =====
+// create stars
 function createStars(count) {
   stars = [];
   for (let i = 0; i < count; i++) {
@@ -43,7 +42,7 @@ function createStars(count) {
   }
 }
 
-// ===== CREATE SHOOTING STAR =====
+// create shooting star with random properties
 function createShootingStar() {
   const startX = Math.random() * canvas.width * 0.7;
   const startY = Math.random() * canvas.height * 0.4;
@@ -58,7 +57,7 @@ function createShootingStar() {
   });
 }
 
-// ===== VERSION 1: TWINKLING STARS =====
+// version 1: simple twinkling stars
 function drawTwinkling() {
   const dark = isDarkMode();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -95,7 +94,7 @@ function drawTwinkling() {
   animationId = requestAnimationFrame(drawTwinkling);
 }
 
-// ===== VERSION 4: TWINKLING + SHOOTING STARS =====
+// version 4: stars + shooting stars
 function drawShootingStars() {
   const dark = isDarkMode();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -160,7 +159,7 @@ function drawShootingStars() {
   animationId = requestAnimationFrame(drawShootingStars);
 }
 
-// ===== SHOOTING STAR SPAWNER (Version 4 only) =====
+// SHOOTING STAR SPAWNER (Version 4 only)
 let shootingStarInterval;
 function startShootingStarSpawner() {
   // Random interval between 2.5 and 6 seconds
@@ -175,7 +174,7 @@ function startShootingStarSpawner() {
   }, randomDelay);
 }
 
-// ===== START ANIMATION =====
+// start the star animation
 function startStars() {
   cancelAnimationFrame(animationId);
   clearTimeout(shootingStarInterval);
@@ -190,13 +189,13 @@ function startStars() {
   }
 }
 
-// ===== RESTART ON RESIZE =====
+// reset canvas and stars on window resize
 window.addEventListener('resize', () => {
   cancelAnimationFrame(animationId);
   startStars();
 });
 
-// ===== RESTART ON THEME CHANGE =====
+// restart star animation when theme changes so it can adapt to light/dark mode
 // This watches for theme changes so stars adapt to light/dark mode
 const themeObserver = new MutationObserver(() => {
   // No need to restart, the isDarkMode() check inside draw handles it live
@@ -206,5 +205,5 @@ themeObserver.observe(document.documentElement, {
   attributeFilter: ['data-theme']
 });
 
-// ===== INIT =====
+// INIT
 startStars();

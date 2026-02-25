@@ -23,7 +23,7 @@ if (!SpeechRecognition) {
   let currentRecognition = null;
   let restartTimer = null;
 
-  // ===== CREATE FRESH RECOGNITION INSTANCE =====
+  // create a new SpeechRecognition instance with proper event handlers
   function createRecognition() {
     const r = new SpeechRecognition();
     r.continuous = false;
@@ -92,7 +92,7 @@ if (!SpeechRecognition) {
     return r;
   }
 
-  // ===== START =====
+  // start listening
   function startListening() {
     manualStop = false;
     isPaused = false;
@@ -105,7 +105,7 @@ if (!SpeechRecognition) {
     currentRecognition.start();
   }
 
-  // ===== PAUSE =====
+  // pause without finalizing input
   function pauseListening() {
     isPaused = true;
     clearTimeout(restartTimer);
@@ -115,7 +115,7 @@ if (!SpeechRecognition) {
     if (voiceHint) voiceHint.textContent = '⏸️ Paused — Click mic to resume | Hold to stop';
   }
 
-  // ===== RESUME =====
+  // resume from pause
   function resumeListening() {
     isPaused = false;
     setBtn('🔴', 'listening', 'Click to pause | Hold 1sec to stop');
@@ -124,7 +124,7 @@ if (!SpeechRecognition) {
     currentRecognition.start();
   }
 
-  // ===== STOP =====
+  // stop listening and finalize input
   function stopListening() {
     manualStop = true;
     isPaused = false;
@@ -139,7 +139,7 @@ if (!SpeechRecognition) {
     voiceUserInput.focus();
   }
 
-  // ===== HELPERS =====
+  // helper to set button state
   function setBtn(icon, className, title) {
     voiceBtn.textContent = icon;
     voiceBtn.title = title;
@@ -160,7 +160,7 @@ if (!SpeechRecognition) {
     }
   }
 
-  // ===== LONG PRESS TO STOP =====
+  // long press to stop
   let pressTimer = null;
   function startPressTimer() {
     pressTimer = setTimeout(() => {
@@ -175,7 +175,7 @@ if (!SpeechRecognition) {
   voiceBtn.addEventListener('touchstart', startPressTimer);
   voiceBtn.addEventListener('touchend', clearPressTimer);
 
-  // ===== ONBOARDING MODAL =====
+  // onboarding modal handlers
   // Placed here AFTER all functions are defined so startListening is available
   function showVoiceOnboarding() {
     voiceModalOverlay.classList.add('open');
@@ -198,7 +198,7 @@ if (!SpeechRecognition) {
     });
   }
 
-  // ===== BUTTON CLICK =====
+  // voice button main click handler
   voiceBtn.addEventListener('click', () => {
     if (!isListening) {
       const seen = localStorage.getItem('rico-voice-onboarding');
