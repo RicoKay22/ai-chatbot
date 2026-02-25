@@ -49,9 +49,11 @@ export default async function handler(req, res) {
       const errorData = await response.json();
       console.error('OpenRouter error:', errorData);
 
-      if (response.status === 429) {
-        return res.status(429).json({ error: 'Rate limit reached. Please wait a moment and try again.' });
-      }
+       if (response.status === 429) {
+          return res.status(429).json({ 
+            error: 'Rate limit reached for this model. Please wait a minute or two, or switch to Mistral 7B.' 
+    });
+  }
       if (response.status === 401) {
         return res.status(401).json({ error: 'Invalid API key. Please check your configuration.' });
       }
