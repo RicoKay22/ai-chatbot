@@ -850,4 +850,3 @@ input:checked + .slider::before { transform: translateX(20px); }
 .history-delete-btn:hover {
   background: rgba(117, 66, 70, 0.2);
 }
-button { border: 2px solid orange !important; }
