@@ -1,0 +1,7 @@
+.env
+node_modules
+.vercel
+.env*.local
+test-api.js
+.vercel
+.env*.local
