@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RicoAI - Your Intelligent Assistant</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+<!-- STAR BACKGROUND CANVAS -->
+<canvas id="starCanvas"></canvas>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">RicoAI</span>
+      </div>
+      <button class="new-chat-btn" id="newChatBtn">+ New Chat</button>
+    </div>
+
+    <div class="chat-history-list" id="chatHistoryList">
+      <!-- Saved chats will appear here -->
+    </div>
+
+    <div class="sidebar-bottom">
+      <button class="settings-btn" id="settingsBtn">⚙ Settings</button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <main class="main" id="main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle">☰</button>
+      <div class="topbar-center">
+        <!-- Model selector dropdown -->
+      <select class="model-select" id="modelSelect">
+        <option value="mistralai/mistral-7b-instruct">Mistral 7B</option>
+        <option value="stepfun/step-3.5-flash:free">StepFun 3.5 Flash</option>
+       <option value="nvidia/nemotron-3-nano-30b-a3b:free">NVIDIA Nemotron 30B</option>
+      </select>
+
+      </div>
+      <div class="topbar-right">
+        <span class="theme-label">☀</span>
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeToggle" checked/>
+          <span class="slider"></span>
+        </label>
+        <span class="theme-label">🌙</span>
+      </div>
+    </header>
+
+    <!-- CHAT WINDOW -->
+    <section class="chat-window" id="chatWindow">
+      <!-- Welcome screen shown before first message -->
+      <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-icon">✦</div>
+        <h1>Welcome to RicoAI</h1>
+        <p>Your intelligent assistant powered by real AI models. Ask me anything.</p>
+        <div class="suggestion-chips">
+          <button class="chip" onclick="useChip(this)">Explain quantum computing</button>
+          <button class="chip" onclick="useChip(this)">Write me a Python function</button>
+          <button class="chip" onclick="useChip(this)">What's the latest in AI?</button>
+          <button class="chip" onclick="useChip(this)">Help me with my essay</button>
+        </div>
+      </div>
+      <!-- Messages appear here -->
+    </section>
+
+    <!-- INPUT AREA -->
+  <!-- INPUT AREA -->
+<footer class="input-area">
+  <div class="input-container">
+    <button class="voice-btn" id="voiceBtn" title="Click to start voice input">🎤</button>
+    <textarea
+      id="userInput"
+      placeholder="Message RicoAI..."
+      rows="1"
+    ></textarea>
+    <button class="send-btn" id="sendBtn" title="Send message">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+        <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+      </svg>
+    </button>
+  </div>
+  <!-- VOICE HINT TEXT -->
+  <p class="voice-hint" id="voiceHint">
+    🔴 Listening — Click to pause &nbsp;|&nbsp; Hold 1 sec to stop
+  </p>
+  <p class="disclaimer">RicoAI can make mistakes. Verify important information.</p>
+</footer>
+
+  </main>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <label>System Prompt (AI Personality)</label>
+        <textarea id="systemPrompt" rows="4">You are RicoAI, a helpful, smart, and concise AI assistant. You can help with anything from coding to creative writing to research.</textarea>
+        <label>Chat Name</label>
+        <input type="text" id="chatNameInput" placeholder="Name this chat..." />
+      </div>
+      <div class="modal-footer">
+        <button class="save-btn" id="saveSettings">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOICE ONBOARDING MODAL -->
+<div class="voice-modal-overlay" id="voiceModalOverlay">
+  <div class="voice-modal">
+    <div class="voice-modal-icon">🎤</div>
+    <h3>How to use Voice Input</h3>
+    <div class="voice-steps">
+      <div class="voice-step">
+        <span class="voice-step-icon">🎤</span>
+        <div class="voice-step-text">
+          <strong>Click once to start</strong>
+          Mic activates and starts listening to you
+        </div>
+      </div>
+      <div class="voice-step">
+        <span class="voice-step-icon">⏸️</span>
+        <div class="voice-step-text">
+          <strong>Click again to pause</strong>
+          Temporarily stop without losing your text
+        </div>
+      </div>
+      <div class="voice-step">
+        <span class="voice-step-icon">🛑</span>
+        <div class="voice-step-text">
+          <strong>Hold for 1 second to stop</strong>
+          Finishes recording and keeps all your text
+        </div>
+      </div>
+      <div class="voice-step">
+        <span class="voice-step-icon">📤</span>
+        <div class="voice-step-text">
+          <strong>Press send when ready</strong>
+          Review your text then hit the send button
+        </div>
+      </div>
+    </div>
+    <button class="voice-got-it-btn" id="voiceGotIt">Got it!</button>
+  </div>
+</div>
+
+  <!-- JS FILES -->
+  <script src="js/stars.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
