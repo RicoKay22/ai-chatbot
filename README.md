@@ -31,7 +31,7 @@ A ChatGPT-style AI chatbot built with vanilla JavaScript, powered by real LLM mo
 | Name | Branch | Contribution |
 |------|--------|-------------|
 | OLAYINKA OLUMIDE | `api-integration` | Serverless function, API integration, Vercel deployment |
-| [Person 2] | `ui-layout` | UI design, chat bubbles, theme toggle, mobile layout |
+| Abdulrazak Abdulrasheed kola | `ui-layout` | UI design, chat bubbles, theme toggle, mobile layout |
 | OLAYINKA OLUMIDE | `chat-logic` | Chat history, localStorage, multi-model, voice input |
 
 ## 🚀 Setup & Installation
