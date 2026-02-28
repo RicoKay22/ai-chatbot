@@ -55,7 +55,11 @@ let lastError = null;
 
     for (const currentModel of fallbackModels) {
       try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const controller = new AbortController();
+const timeout = setTimeout(() => controller.abort(), 8000); // 8 second timeout per model
+
+const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+  signal: controller.signal,
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
@@ -84,6 +88,7 @@ let lastError = null;
         }
 
         const data = await response.json();
+        clearTimeout(timeout);
 
         const content = data.choices?.[0]?.message?.content 
           || data.choices?.[0]?.text 
