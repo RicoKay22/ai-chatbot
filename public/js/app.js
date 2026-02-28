@@ -240,6 +240,12 @@ async function sendMessage() {
     // Render AI response
     renderMessage('ai', data.message);
 
+    // Update dropdown to show which model actually responded
+    if (data.model && data.model !== modelSelect.value) {
+      modelSelect.value = data.model;
+      showToast(`Switched to ${data.model.split('/')[1] || data.model}`);
+    }
+
     // Add AI response to history
     addToHistory('assistant', data.message);
 
