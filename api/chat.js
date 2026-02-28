@@ -27,15 +27,29 @@
       return res.status(400).json({ error: 'Invalid messages format' });
     }
 
-    // Fallback chain - if selected model fails, try the next one
-    const fallbackModels = [
-      model || 'nvidia/nemotron-3-nano-30b-a3b:free',
-      'stepfun/step-3.5-flash:free',
-      'cohere/command-light',
-      'mistralai/mistral-7b-instruct',
-    ].filter((m, index, self) => self.indexOf(m) === index); // remove duplicates
+    // Check if any message contains an image
+const hasImage = messages.some(m => 
+  Array.isArray(m.content) && m.content.some(c => c.type === 'image_url')
+);
 
-    let lastError = null;
+// Vision-capable models only for image requests
+const visionModels = [
+  'google/gemma-3-27b-it:free',
+  'google/gemma-3-12b-it:free',
+  'meta-llama/llama-3.2-11b-vision-instruct:free'
+];
+
+// Regular models for text requests
+const textModels = [
+  model || 'nvidia/nemotron-3-nano-30b-a3b:free',
+  'stepfun/step-3.5-flash:free',
+  'cohere/command-light',
+  'mistralai/mistral-7b-instruct',
+];
+
+const fallbackModels = hasImage ? visionModels : textModels;
+    
+let lastError = null;
 
     for (const currentModel of fallbackModels) {
       try {
