@@ -65,23 +65,26 @@ Create a `.env.local` file with:
 OPENROUTER_API_KEY=your-openrouter-api-key-here
 SITE_URL=http://localhost:3000
  
-## 📁 Project Structure  
+## 📁 Project Structure
+
+​```
 ai-chatbot/
 ├── api/
-│   └── chat.js          # Vercel serverless function (API key protected)
+│   └── chat.js
 ├── public/
-│   ├── index.html       # Main HTML
+│   ├── index.html
 │   ├── css/
-│   │   └── style.css    # All styling
+│   │   └── style.css
 │   └── js/
-│       ├── app.js       # Main app logic
-│       ├── chat.js      # Chat history & localStorage
-│       ├── voice.js     # Voice input
-│       └── stars.js     # Star background animation
-├── .env.local           # API key (never committed)
+│       ├── app.js
+│       ├── chat.js
+│       ├── voice.js
+│       └── stars.js
+├── .env.local
 ├── .gitignore
-├── vercel.json          # Vercel configuration
-└── README.md 
+├── vercel.json
+└── README.md
+​```
 
 ## 🔒 Security
 The OpenRouter API key is stored as an environment variable on Vercel's servers and is never exposed to the browser. All AI requests are proxied through a serverless function at `/api/chat`. 
