@@ -1,11 +1,8 @@
 // app.js - Main application logic
 
 console.log('RicoAI app.js loaded');
-
-
-
-
-// state variables
+  
+ // state variables
 let isLoading = false;
 let currentSystemPrompt = `You are RicoAI, a helpful, smart, and concise AI assistant. 
 You can help with anything from coding to creative writing to research.`;
@@ -26,6 +23,123 @@ const systemPromptInput = document.getElementById('systemPrompt');
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
 
+// ===== DOCUMENT UPLOAD =====
+const uploadBtn = document.getElementById('uploadBtn');
+const fileInput = document.getElementById('fileInput');
+const fileBadge = document.getElementById('fileBadge');
+const fileNameDisplay = document.getElementById('fileNameDisplay');
+const fileClearBtn = document.getElementById('fileClearBtn');
+
+let uploadedDocumentText = null;
+let uploadedFileName = null;
+
+// Click paperclip to open file picker
+uploadBtn.addEventListener('click', () => fileInput.click());
+
+// Handle file selection
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+});
+
+// Clear document
+fileClearBtn.addEventListener('click', () => {
+  uploadedDocumentText = null;
+  uploadedFileName = null;
+  fileInput.value = '';
+  fileBadge.style.display = 'none';
+  showToast('Document removed');
+});
+
+// Drag and drop on chat window
+chatWindow.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  chatWindow.classList.add('drag-over');
+});
+
+chatWindow.addEventListener('dragleave', () => {
+  chatWindow.classList.remove('drag-over');
+});
+
+chatWindow.addEventListener('drop', (e) => {
+  e.preventDefault();
+  chatWindow.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+});
+
+// Process the uploaded file
+async function processFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const maxSize = 5 * 1024 * 1024; // 5MB limit
+
+  if (file.size > maxSize) {
+    showToast('File too large. Maximum size is 5MB.');
+    return;
+  }
+
+  showToast('Reading document...');
+
+  try {
+    let text = '';
+
+    if (ext === 'txt') {
+      text = await file.text();
+    } else if (ext === 'pdf') {
+      text = await extractPdfText(file);
+    } else if (ext === 'docx') {
+      text = await extractDocxText(file);
+    } else {
+      showToast('Unsupported file type. Use PDF, DOCX or TXT.');
+      return;
+    }
+
+    if (!text || text.trim().length < 10) {
+      showToast('Could not extract text from this file.');
+      return;
+    }
+
+    // Limit to ~3000 words to stay within token limits
+    const words = text.trim().split(/\s+/);
+    if (words.length > 3000) {
+      text = words.slice(0, 3000).join(' ') + '\n\n[Document truncated to 3000 words due to token limits]';
+      showToast('Document loaded! (Truncated to 3000 words)');
+    } else {
+      showToast(`Document loaded! (${words.length} words)`);
+    }
+
+    uploadedDocumentText = text;
+    uploadedFileName = file.name;
+    fileNameDisplay.textContent = `📄 ${file.name}`;
+    fileBadge.style.display = 'flex';
+
+  } catch (err) {
+    console.error('File processing error:', err);
+    showToast('Error reading file. Please try another.');
+  }
+}
+
+// Extract text from PDF using PDF.js
+async function extractPdfText(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    fullText += content.items.map(item => item.str).join(' ') + '\n';
+  }
+  return fullText;
+}
+
+// Extract text from DOCX using Mammoth.js
+async function extractDocxText(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer });
+  return result.value;
+}
+
 // theme toggle
 themeToggle.addEventListener('change', () => {
   const theme = themeToggle.checked ? 'dark' : 'light';
@@ -42,8 +156,7 @@ themeToggle.checked = savedTheme === 'dark';
 
 // mobile sidebar toggle
 menuToggle.addEventListener('click', () => {
-  sidebar.classList.toggle('open');
-  // Create overlay if it doesn't exist
+sidebar.classList.toggle('open');
   let overlay = document.querySelector('.sidebar-overlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -102,7 +215,7 @@ function hideWelcome() {
   }
 }
 
-// render a message bubble 
+// render a message bubble
 function renderMessage(role, content) {
   hideWelcome();
 
@@ -120,15 +233,12 @@ function renderMessage(role, content) {
   bubble.className = 'bubble';
 
   if (role === 'ai') {
-    // Render markdown for AI responses
-    bubble.innerHTML = marked.parse(content);
-    // Syntax highlight code blocks
+  bubble.innerHTML = marked.parse(content);
     bubble.querySelectorAll('pre code').forEach(block => {
       hljs.highlightElement(block);
     });
   } else {
-    // Plain text for user messages
-    bubble.textContent = content;
+   bubble.textContent = content;
   }
 
   const meta = document.createElement('div');
@@ -191,35 +301,31 @@ function scrollToBottom() {
 async function sendMessage() {
   const content = userInput.value.trim();
   if (!content || isLoading) return;
-
-  // Clear input
+ 
   userInput.value = '';
   userInput.style.height = 'auto';
 
-  // Disable send button
-  isLoading = true;
+   isLoading = true;
   sendBtn.disabled = true;
 
-  // Render user message
-  renderMessage('user', content);
-
-  // Add to chat history
-  addToHistory('user', content);
-
-  // Show typing indicator
-  showTypingIndicator();
+renderMessage('user', content);
+  addToHistory('user', content);  showTypingIndicator();
 
   try {
-    // Build messages array with system prompt
+    // Build system prompt - include document if uploaded
+    let systemContent = currentSystemPrompt;
+    if (uploadedDocumentText) {
+      systemContent += `\n\nThe user has uploaded a document called "${uploadedFileName}". Use this as context to answer their questions:\n\n---\n${uploadedDocumentText}\n---`;
+    }
+
     const messages = [
-      { role: 'system', content: currentSystemPrompt },
+      { role: 'system', content: systemContent },
       ...getChatHistory()
     ];
 
     const selectedModel = modelSelect.value;
 
-    // Call our serverless function
-    const response = await fetch('/api/chat', {
+     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -237,8 +343,7 @@ async function sendMessage() {
       return;
     }
 
-    // Render AI response
-    renderMessage('ai', data.message);
+  renderMessage('ai', data.message);
 
     // Update dropdown to show which model actually responded
     if (data.model && data.model !== modelSelect.value) {
@@ -246,10 +351,7 @@ async function sendMessage() {
       showToast(`Switched to ${data.model.split('/')[1] || data.model}`);
     }
 
-    // Add AI response to history
-    addToHistory('assistant', data.message);
-
-    // Save chat to localStorage
+  addToHistory('assistant', data.message);
     saveCurrentChat();
 
   } catch (error) {
@@ -266,7 +368,7 @@ async function sendMessage() {
 // event listener for send button
 sendBtn.addEventListener('click', sendMessage);
 
-// send on enter(Shift+Enter for new line)
+// send on enter (Shift+Enter for new line)
 userInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -289,9 +391,12 @@ function useChip(btn) {
 // new chat button - clear history and show welcome screen
 newChatBtn.addEventListener('click', () => {
   clearChatHistory();
+  uploadedDocumentText = null;
+  uploadedFileName = null;
+  fileInput.value = '';
+  fileBadge.style.display = 'none';
   chatWindow.innerHTML = '';
-  // Restore welcome screen
-  const welcome = document.createElement('div');
+   const welcome = document.createElement('div');
   welcome.className = 'welcome-screen';
   welcome.id = 'welcomeScreen';
   welcome.innerHTML = `

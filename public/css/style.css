@@ -852,3 +852,66 @@ input:checked + .slider::before { transform: translateX(20px); }
 }
 
 button { border: 2px solid orange !important; }
+
+
+/* ===== DOCUMENT UPLOAD ===== */
+.file-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  padding: 6px 12px;
+  margin: 0 16px 8px 16px;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  width: fit-content;
+  max-width: calc(100% - 32px);
+}
+
+.file-badge span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+
+.file-clear-btn {
+  background: none;
+  border: none !important;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.file-clear-btn:hover {
+  color: var(--text-primary);
+}
+
+/* Drag and drop overlay */
+.drag-over {
+  outline: 2px dashed var(--accent);
+  outline-offset: -8px;
+  background: rgba(16, 163, 55, 0.05) !important;
+}
+
+.icon-btn {
+  background: none;
+  border: none !important;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  color: var(--accent);
+  background: var(--bg-secondary);
+}

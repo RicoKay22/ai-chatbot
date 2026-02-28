@@ -9,6 +9,8 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
 <!-- STAR BACKGROUND CANVAS -->
@@ -45,10 +47,9 @@
       <option value="nvidia/nemotron-3-nano-30b-a3b:free">NVIDIA Nemotron 30B</option>
       <option value="stepfun/step-3.5-flash:free">StepFun 3.5 Flash</option>
       <option value="cohere/command-light">Cohere Command Light</option>
-       <option value="mistralai/mistral-7b-instruct">Mistral 7B</option>
+      <option value="mistralai/mistral-7b-instruct">Mistral 7B</option>
       <option value="qwen/qwen3-coder:free">Qwen3 Coder (Coding Only)</option>
     </select>
-
       </div>
       <div class="topbar-right">
         <span class="theme-label">☀</span>
@@ -78,9 +79,16 @@
     </section>
 
     <!-- INPUT AREA -->
-  <!-- INPUT AREA -->
 <footer class="input-area">
+  <!-- FILE BADGE - shows when document is uploaded -->
+  <div class="file-badge" id="fileBadge" style="display:none">
+    <span id="fileNameDisplay">📄 document.pdf</span>
+    <button class="file-clear-btn" id="fileClearBtn">✕</button>
+  </div>
+
   <div class="input-container">
+    <input type="file" id="fileInput" accept=".pdf,.docx,.txt" style="display:none">
+    <button class="icon-btn" id="uploadBtn" title="Upload document (PDF, DOCX, TXT)">📎</button>
     <button class="voice-btn" id="voiceBtn" title="Click to start voice input">🎤</button>
     <textarea
       id="userInput"
