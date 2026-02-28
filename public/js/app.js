@@ -30,8 +30,10 @@ const fileBadge = document.getElementById('fileBadge');
 const fileNameDisplay = document.getElementById('fileNameDisplay');
 const fileClearBtn = document.getElementById('fileClearBtn');
 
-let uploadedDocumentText = null;
+ let uploadedDocumentText = null;
 let uploadedFileName = null;
+let uploadedImageBase64 = null;
+let uploadedImageMimeType = null;
 
 // Click paperclip to open file picker
 uploadBtn.addEventListener('click', () => fileInput.click());
@@ -43,12 +45,14 @@ fileInput.addEventListener('change', (e) => {
 });
 
 // Clear document
-fileClearBtn.addEventListener('click', () => {
+ fileClearBtn.addEventListener('click', () => {
   uploadedDocumentText = null;
   uploadedFileName = null;
+  uploadedImageBase64 = null;
+  uploadedImageMimeType = null;
   fileInput.value = '';
   fileBadge.style.display = 'none';
-  showToast('Document removed');
+  showToast('File removed');
 });
 
 // Drag and drop on chat window
@@ -83,14 +87,19 @@ async function processFile(file) {
   try {
     let text = '';
 
+    const imageExts = ['jpg', 'jpeg', 'png', 'webp'];
+
     if (ext === 'txt') {
       text = await file.text();
     } else if (ext === 'pdf') {
       text = await extractPdfText(file);
     } else if (ext === 'docx') {
       text = await extractDocxText(file);
+    } else if (imageExts.includes(ext)) {
+      await handleImageUpload(file);
+      return;
     } else {
-      showToast('Unsupported file type. Use PDF, DOCX or TXT.');
+      showToast('Unsupported file type. Use PDF, DOCX, TXT or an image.');
       return;
     }
 
@@ -138,6 +147,26 @@ async function extractDocxText(file) {
   const arrayBuffer = await file.arrayBuffer();
   const result = await mammoth.extractRawText({ arrayBuffer });
   return result.value;
+}
+
+// Handle image upload - convert to base64
+async function handleImageUpload(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      uploadedImageBase64 = base64;
+      uploadedImageMimeType = file.type;
+      uploadedDocumentText = null; // clear any previous doc
+      uploadedFileName = file.name;
+      fileNameDisplay.textContent = `🖼️ ${file.name}`;
+      fileBadge.style.display = 'flex';
+      showToast(`Image loaded! Ask me anything about it.`);
+      resolve();
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 // theme toggle
@@ -318,9 +347,24 @@ renderMessage('user', content);
       systemContent += `\n\nThe user has uploaded a document called "${uploadedFileName}". Use this as context to answer their questions:\n\n---\n${uploadedDocumentText}\n---`;
     }
 
+     let userMessage;
+    if (uploadedImageBase64) {
+      // Vision message format
+      userMessage = {
+        role: 'user',
+        content: [
+          { type: 'text', text: content },
+          { type: 'image_url', image_url: { url: `data:${uploadedImageMimeType};base64,${uploadedImageBase64}` } }
+        ]
+      };
+    } else {
+      userMessage = { role: 'user', content: content };
+    }
+
     const messages = [
       { role: 'system', content: systemContent },
-      ...getChatHistory()
+      ...getChatHistory().slice(0, -1), // exclude last user message since we're replacing it
+      userMessage
     ];
 
     const selectedModel = modelSelect.value;
@@ -393,6 +437,8 @@ newChatBtn.addEventListener('click', () => {
   clearChatHistory();
   uploadedDocumentText = null;
   uploadedFileName = null;
+  uploadedImageBase64 = null;
+  uploadedImageMimeType = null;
   fileInput.value = '';
   fileBadge.style.display = 'none';
   chatWindow.innerHTML = '';

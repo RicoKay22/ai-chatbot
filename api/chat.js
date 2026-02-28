@@ -47,12 +47,12 @@
             'HTTP-Referer': process.env.SITE_URL || 'http://localhost:3000',
             'X-Title': 'RicoAI'
           },
-          body: JSON.stringify({
-            model: currentModel,
-            messages: messages,
-            max_tokens: 1024,
-            temperature: 0.7
-          })
+         body: JSON.stringify({
+          model: currentModel,
+           messages: messages,
+           max_tokens: 2048,
+           temperature: 0.7
+    })
         });
 
         // Handle specific error codes
