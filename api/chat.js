@@ -33,13 +33,15 @@ const hasImage = messages.some(m =>
 );
 
 // Vision-capable models only for image requests
-const visionModels = [
+ const visionModels = [
   'google/gemma-3-27b-it:free',
+  'nvidia/nemotron-nano-12b-v2-vl:free',
+  'mistralai/mistral-small-3.1-24b-instruct:free',
   'google/gemma-3-12b-it:free',
-  'meta-llama/llama-3.2-11b-vision-instruct:free'
+  'google/gemma-3-4b-it:free',
+  'nvidia/llama-nemotron-embed-vl-1b-v2:free'
 ];
-
-// Regular models for text requests
+ // Regular models for text requests
 const textModels = [
   model || 'nvidia/nemotron-3-nano-30b-a3b:free',
   'stepfun/step-3.5-flash:free',
